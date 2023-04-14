@@ -1,0 +1,8 @@
+.unterprojekt{
+	width: 30%;
+}
+.neues-unterprojekt{
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+}

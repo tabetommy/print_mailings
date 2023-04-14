@@ -1,0 +1,8 @@
+.projekt{
+	width: 30%;
+}
+.neues-projekt{
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+}

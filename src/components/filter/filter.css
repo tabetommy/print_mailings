@@ -1,0 +1,8 @@
+.filter-con{
+	width: 80%;
+}
+.filter-components{
+	display:flex;
+	justify-content: space-between;
+	margin-bottom: 80px;
+}
