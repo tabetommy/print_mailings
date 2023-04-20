@@ -23,11 +23,11 @@ export const FilteredValues=()=>{
 	},[projekt, unterprojekt,pal]);
 	
 	const getData= async ()=>{
-		const app = new Realm.App({ id: "PLACE YOUR APP ID" });
+		const app = new Realm.App({ id: "mypracticeapp-zwwer" });
 		const credentials = Realm.Credentials.anonymous();
 		try {
 		  const user = await app.logIn(credentials);
-		  const getUnterProjektData= user.functions.getUnterProjektData();
+		  const getUnterProjektData= user.functions.getAllData();
 		  getUnterProjektData.then(resp=>setData(resp));
 		} catch(err) {
 		  console.error("Failed to log in", err);
@@ -38,7 +38,7 @@ export const FilteredValues=()=>{
 	useEffect(()=>{
 		getData();
 	},[])
-	
+	console.log(data)
 	return(
 		<>
 		{isUpdated?
@@ -50,7 +50,7 @@ export const FilteredValues=()=>{
 			:
 			null
 		}
-		{data.length>0 && data.map((data)=><p key={data._id}>{data.bezeichnung}</p>)}
+		{<embed src= {data[0].versionen[0].path} width= "500" height= "375" type="application/pdf" />}
 		</>
 	)
 }

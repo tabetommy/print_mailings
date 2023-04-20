@@ -3,13 +3,13 @@ import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
-//versionWerten[index].beleg
+import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
 
-const Versionen=()=>{
+const HalbVersion=({versionWerten, setVersionWerten, selectedFile, setSelectedFile})=>{
 
-	  const [versionWerten, setVersionWerten]=useState([{ beleg:null,version: "", menge:undefined}]);
-	  const [isFileselected, setIsFileSelected]=useState(false)
-	  
+   
+   const [isFileselected, setIsFileSelected]=useState(false)
  
 
   const handleChange = (index, event) => {
@@ -20,30 +20,50 @@ const Versionen=()=>{
 	}else if(event.target.name==='menge'){
 		neueVersionWerten [index].menge= event.target.value;
 		setVersionWerten(neueVersionWerten);
-	}else if(event.target.name==='beleg'){
+	}else if(event.target.name==='datei'){
 		setIsFileSelected(true);
-		neueVersionWerten[index].beleg= event.target.files[0]; 
+		neueVersionWerten[index].datei= event.target.files[0]; 
 		setVersionWerten(neueVersionWerten);
-	}else{
+		updatePath(index)
 		console.log("Jesus")
 	}
   }
-
-	
-
-	 const hinzufügenHandler=(event)=>{
-		 event.preventDefault();
-		 setVersionWerten([...versionWerten, { beleg:null, version: "" ,  menge:undefined}])
-	}
-
-	const handleFileDelete=(index)=>{
-		let neueVersionWerten=[...versionWerten];
-		neueVersionWerten[index].beleg= null;
-		setVersionWerten(neueVersionWerten);
-		console.log(versionWerten)
-		//delete then turn isFileSelected back to false
-	}
-	
+  
+  
+  
+  const updatePath=(index)=>{
+	   const formData = new FormData();  //create new form object
+		  formData.append("myImage", versionWerten[index].datei);//add image to form object
+		  axios({
+			method: "post",
+			url: "http://localhost:5000/upload-image",
+			data: formData,  //send image to server
+		  })
+		   .then((response) => {
+			const { data } = response; //return image url of uploaded img
+			//update path in versionWerten state with url
+			let neueVersionWerten = [...versionWerten];
+			neueVersionWerten[index].path= data.url; 
+			setVersionWerten(neueVersionWerten);
+		  })
+		   .catch((err) => {
+			console.log(err);
+		  });	  
+   }
+    
+   //add the version element with pdf upload and amount
+   const hinzufügenHandler=(event)=>{
+		event.preventDefault();
+		setVersionWerten([...versionWerten, { id:uuidv4(), datei:null, path:"", version: "" ,  menge:undefined}])
+   }
+   
+   const handleFileDelete=(index)=>{
+	   let neueVersionWerten=[...versionWerten];
+	   neueVersionWerten[index].beleg= null;
+	   setVersionWerten(neueVersionWerten);
+	   console.log(versionWerten)
+	   //delete then turn isFileSelected back to false
+   }
    
   return (
 	<div className='main-con'>
@@ -51,9 +71,9 @@ const Versionen=()=>{
 			<div  key={index}>
 				<div className='versionen-input'>
 					<div className='beleg'>
-						<label htmlFor='beleg'>Upload</label><br/>                 
+						<label htmlFor='datei'>Upload</label><br/>                 
 							<IconButton color="primary" component="label" className='btn-upload'>
-								<input hidden type="file" name='beleg' 
+								<input hidden type="file" name='datei' 
 								 onChange={event => handleChange(index, event)} />
 								<AddIcon />
 							</IconButton>
@@ -66,14 +86,14 @@ const Versionen=()=>{
 					<div className='versandmenge'>
 						<label htmlFor='menge'>Versandmenge</label><br/>
 						<input type="number" id="menge" name="menge" min="0" className='versandmenge-input' 
-						value={version.menge}   onChange={event => handleChange(index, event)}/> 
+						value={version.menge===undefined? '': version.menge}   onChange={event => handleChange(index, event)}/> 
 					</div>
 				</div>
-				{versionWerten[index].beleg?
+				{versionWerten[index].datei?
 				<div className='file-detail'>
 					<div className='file-detail-name'>
 						<span><InsertDriveFileOutlinedIcon/></span>
-						<span>{version.beleg.name}</span>
+						<span>{version.datei.name}</span>
 					</div>
 					<span 
 					className='file-detail-delete'
@@ -94,4 +114,4 @@ const Versionen=()=>{
   );
 }
 
-export default Versionen;
+export default HalbVersion;
