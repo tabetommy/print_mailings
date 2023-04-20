@@ -149,3 +149,4 @@ medium:[{
 		  setKommentar("");
 		  setGesamtMenge(undefined);
 	  }
+	  

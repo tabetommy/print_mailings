@@ -6,7 +6,7 @@ import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutl
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 
-const HalbVersion=({versionWerten, setVersionWerten, selectedFile, setSelectedFile})=>{
+const Version=({versionWerten, setVersionWerten})=>{
 
    
    const [isFileselected, setIsFileSelected]=useState(false)
@@ -114,4 +114,4 @@ const HalbVersion=({versionWerten, setVersionWerten, selectedFile, setSelectedFi
   );
 }
 
-export default HalbVersion;
+export default Version;

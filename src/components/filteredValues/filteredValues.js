@@ -5,7 +5,7 @@ import * as Realm from 'realm-web';
 
 export const FilteredValues=()=>{
 	const [isUpdated,setIsUpdated]= React.useState(false);//check if all states have been updated
-	const [data,setData]= useState([]);
+	const [filteredData,setFilteredData]= useState([]);//filteredata updated by data retrieved from databank
 	
 	const {projektState}=useContext(FilteredValuesContext);
 	const [projekt, setprojekt]=projektState;
@@ -17,28 +17,24 @@ export const FilteredValues=()=>{
 	React.useEffect(()=>{
 		//if all states have been updated, update isUpdated to true
 		if( projekt && unterprojekt && pal){
-			console.log("ffffff")
 			setIsUpdated(true)
 		}
 	},[projekt, unterprojekt,pal]);
 	
-	const getData= async ()=>{
+	const getFilteredData= async ()=>{
 		const app = new Realm.App({ id: "mypracticeapp-zwwer" });
 		const credentials = Realm.Credentials.anonymous();
 		try {
 		  const user = await app.logIn(credentials);
-		  const getUnterProjektData= user.functions.getAllData();
-		  getUnterProjektData.then(resp=>setData(resp));
+		  const filteredDataVals= user.functions.filterData("Dekorunde","CB-GK","2023-04-18");
+		  filteredDataVals.then(resp=>setFilteredData(resp));
 		} catch(err) {
 		  console.error("Failed to log in", err);
 		}
 		
 	}
 	
-	useEffect(()=>{
-		getData();
-	},[])
-	console.log(data)
+	
 	return(
 		<>
 		{isUpdated?
@@ -50,7 +46,6 @@ export const FilteredValues=()=>{
 			:
 			null
 		}
-		{<embed src= {data[0].versionen[0].path} width= "500" height= "375" type="application/pdf" />}
 		</>
 	)
 }
