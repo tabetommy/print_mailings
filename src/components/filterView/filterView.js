@@ -1,8 +1,9 @@
 import * as React from 'react';
 import * as Realm from 'realm-web';
-import { Document} from 'react-pdf';
 import {FilteredValuesContext} from '../globalState';
 import './filterView.css';
+//filteredData.length >0?filteredData[0].versionen[0].path:null
+
 
 	
 
@@ -41,11 +42,14 @@ export default function FilterView() {
 	  <div>
 	  	<table className="filtered-vals-table">
 		  <thead>
-		  	<tr>
+		  	 { filteredData.length >0 ?
+			  <tr>
 				<th>Medium</th>
 				<th>Versionierung</th>
 				<th>Versandmenge</th>
-			  </tr>
+			  </tr>:
+			  null
+		     }
 		  </thead>
 		  <tbody>
 			{filteredData.map((data)=>{
@@ -59,10 +63,14 @@ export default function FilterView() {
 			})}
 		  </tbody>
 	  	</table>
-		<embed src={filteredData.length >0?filteredData[0].versionen[0].path:null} width="500" height="375" 
-		 type="application/pdf" />
-		 <Document file={"http://localhost:5000/image/Arbeitserlaubnis.pdf"}>
-		 </Document>
+		 <div className="image-con">
+		 {filteredData.map((data)=>{
+			 return data.versionen.map((version,i)=>(
+				 <img src={version.path} className="images" key={i}/>
+			 ))
+		 })}
+		 </div>
+		
 	  </div>
 	  
   );
