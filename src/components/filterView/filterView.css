@@ -1,11 +1,22 @@
+.filtered-main{
+	display: flex;
+}
 .filtered-vals-table th{
-	padding: 8px
+	padding: 8px;
+	text-align: left;
 }
 .filtered-vals-table td{
 	padding: 5px
 }	
 .images{
-	width:300px;
-	height: 400px;
-	margin: 20px;
+	width:200px;
+	height: 300px;
+	margin: 10px;
+}
+.filtered-vals-table{
+	flex:1;
+	align-self: flex-start; 
+} 
+.image-con{
+	flex: 2;
 }

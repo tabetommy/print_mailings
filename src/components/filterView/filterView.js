@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as Realm from 'realm-web';
 import {FilteredValuesContext} from '../globalState';
 import './filterView.css';
-//filteredData.length >0?filteredData[0].versionen[0].path:null
 
 
 	
@@ -10,6 +9,7 @@ import './filterView.css';
 export default function FilterView() {
 	
 	const [filteredData,setFilteredData]= React.useState([]);//filteredata updated by data retrieved from databank
+	const [mediumSumme, setMediumSumme]=React.useState()
 	
 	const {projektState}=React.useContext(FilteredValuesContext);
 	const [projekt, setprojekt]=projektState;
@@ -20,7 +20,7 @@ export default function FilterView() {
 
 	
 	const getFilteredData= async ()=>{
-		const app = new Realm.App({ id: "mypracticeapp-zwwer" });
+		const app = new Realm.App({ id: "put id here" });
 		const credentials = Realm.Credentials.anonymous();
 		try {
 		  const user = await app.logIn(credentials);
@@ -37,9 +37,24 @@ export default function FilterView() {
 			getFilteredData()
 		}
 	},[projekt,unterprojekt,pal])
+	
+	React.useEffect(()=>{
+		let newSum=0
+		filteredData.forEach(data=>{
+			newSum += Number(data.gesamtmenge)
+		})
+		setMediumSumme(newSum);
+	},[filteredData])
 
   return (
-	  <div>
+	  <div className="filtered-main">
+	    <div className="image-con">
+		 {filteredData.map((data)=>{
+			 return data.versionen.map((version,i)=>(
+				 <img src={version.path} className="images" key={i}/>
+			 ))
+		 })}
+		</div>
 	  	<table className="filtered-vals-table">
 		  <thead>
 		  	 { filteredData.length >0 ?
@@ -61,16 +76,16 @@ export default function FilterView() {
 					</tr>
 				))
 			})}
+			{ filteredData.length >0?
+				<tr>
+					<td>Gesamtmenge</td>
+					<td></td>
+					<td>{mediumSumme}</td>
+				</tr>:
+				null
+			}
 		  </tbody>
 	  	</table>
-		 <div className="image-con">
-		 {filteredData.map((data)=>{
-			 return data.versionen.map((version,i)=>(
-				 <img src={version.path} className="images" key={i}/>
-			 ))
-		 })}
-		 </div>
-		
 	  </div>
 	  
   );

@@ -29,7 +29,13 @@ const Version=({versionWerten, setVersionWerten})=>{
 	}
   }
   
-  
+  // accumualate the version amounts for gesamtMenge state
+ // React.useEffect(()=>{
+	  //let accumulatedVersion=versionWerten.reduce((total, menge)=>{
+		  //return total + versionWerten.menge
+	  //},0);
+	  //setGesamtMenge(accumulatedVersion)
+  //},[versionWerten.menge])
   
   const updatePath=(index)=>{
 	   const formData = new FormData();  //create new form object
@@ -59,7 +65,7 @@ const Version=({versionWerten, setVersionWerten})=>{
    
    const handleFileDelete=(index)=>{
 	   let neueVersionWerten=[...versionWerten];
-	   neueVersionWerten[index].beleg= null;
+	   neueVersionWerten[index].datei= null;
 	   setVersionWerten(neueVersionWerten);
 	   console.log(versionWerten)
 	   //delete then turn isFileSelected back to false

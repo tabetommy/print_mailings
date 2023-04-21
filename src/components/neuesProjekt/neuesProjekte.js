@@ -44,7 +44,7 @@ const Neuesprojekt=()=>{
   //send data to database
   const handleSubmit= async (event)=>{
 	event.preventDefault();
-	const app = new Realm.App({ id: "mypracticeapp-zwwer" });
+	const app = new Realm.App({ id: "place app id here" });
 	const credentials = Realm.Credentials.anonymous();
 	try {
 	  const user = await app.logIn(credentials);
