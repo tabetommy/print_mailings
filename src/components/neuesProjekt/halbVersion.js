@@ -137,16 +137,20 @@ medium:[{
 	  },[versionWerten[0].datei]);
 	  
 	  
-	//clear inputs
-	//reset states
-	  const clearInputs=(event)=>{
-		  event.preventDefault()
-		  setProjektWerte("");
-		  setUnterProjektWerte(" ");
-		  setDatum(undefined);
-		  setMedium("");
-		  setVersionWerten([{ datei:null, version:" ", path:" ", menge:undefined}]);
-		  setKommentar("");
-		  setGesamtMenge(undefined);
-	  }
+	// function to send data to database
+	exports = async function(oberprojekt,unterprojekt,pal,medium,versionen, kommentar, gesamtmenge){
+	
+	  // Find the name of the MongoDB service you want to use (see "Linked Data Sources" tab)
+	  var serviceName = "mongodb-atlas";
+	
+	  // Update these to reflect your db/collection
+	  var dbName = "printMedien";
+	  var collName = "projekt";
+	
+	  // Get a collection from the context
+	  var collection = context.services.get(serviceName).db(dbName).collection(collName);
+	  
+	   collection.insertOne({"oberprojekt": oberprojekt, "unterProjekt": unterprojekt, "pal":pal, "medium":medium, "versionen":versionen, "kommentar":kommentar, "gesamtmenge":gesamtmenge})
+	
+	};
 	  

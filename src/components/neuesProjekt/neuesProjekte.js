@@ -1,6 +1,7 @@
 import React from 'react';
 import {useNavigate} from 'react-router-dom';
 import Versionen from './versionen';
+import Medium from './medium';
 import './neuesProjekt.css';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import * as Realm from 'realm-web';
@@ -132,6 +133,7 @@ const Neuesprojekt=()=>{
 		<button className='pr-speichern' onClick={handleSubmit}>Projekt speichern</button>
 		<span className='verwerfen' onClick={clearInputs}>Verwerfen</span>
 	  </div>
+	  <Medium />
 	</form>
 	
   );
