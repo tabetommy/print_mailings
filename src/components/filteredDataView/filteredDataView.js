@@ -1,12 +1,14 @@
 import * as React from 'react';
 import * as Realm from 'realm-web';
 import {FilteredValuesContext} from '../globalState';
-import './filterView.css';
+import './filteredDataView.css';
+import Pdf from './Pdf';
+//import PdfImage from './Pdf2Image';
 
 
 	
 
-export default function FilterView() {
+export default function FilteredDataView() {
 	
 	const [filteredData,setFilteredData]= React.useState([]);//filteredata updated by data retrieved from databank
 	const [mediumSumme, setMediumSumme]=React.useState()
@@ -20,7 +22,7 @@ export default function FilterView() {
 
 	
 	const getFilteredData= async ()=>{
-		const app = new Realm.App({ id: "put id here" });
+		const app = new Realm.App({ id: "mypracticeapp-zwwer" });
 		const credentials = Realm.Credentials.anonymous();
 		try {
 		  const user = await app.logIn(credentials);
@@ -32,30 +34,37 @@ export default function FilterView() {
 		
 	}
 	
+	//display filtered values or not
 	React.useEffect(()=>{
 		if( projekt && unterprojekt && pal){
 			getFilteredData()
 		}
 	},[projekt,unterprojekt,pal])
 	
+	//add different versions in medium
 	React.useEffect(()=>{
-		let newSum=0
+		let newSum=0;
 		filteredData.forEach(data=>{
 			newSum += Number(data.gesamtmenge)
 		})
 		setMediumSumme(newSum);
 	},[filteredData])
-
+	
+    console.log(filteredData);
   return (
 	  <div className="filtered-main">
-	    <div className="image-con">
-		 {filteredData.map((data)=>{
-			 return data.versionen.map((version,i)=>(
-				 <img src={version.path} className="images" key={i}/>
-			 ))
+	  	<div className="image-con">
+		 {filteredData.map((data,i)=>{
+			 return data.medium.map((media)=>{
+				 return media.versionen.map((version)=>{
+					 return(
+						 <Pdf pdfUrl={version.path.url} key={version.path.imageName}/>
+					 )
+				 })
+			 })
 		 })}
 		</div>
-	  	<table className="filtered-vals-table">
+	  	{/*<table className="filtered-vals-table">
 		  <thead>
 		  	 { filteredData.length >0 ?
 			  <tr>
@@ -85,7 +94,7 @@ export default function FilterView() {
 				null
 			}
 		  </tbody>
-	  	</table>
+	  	</table>*/}
 	  </div>
 	  
   );

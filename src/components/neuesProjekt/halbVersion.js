@@ -153,4 +153,44 @@ medium:[{
 	   collection.insertOne({"oberprojekt": oberprojekt, "unterProjekt": unterprojekt, "pal":pal, "medium":medium, "versionen":versionen, "kommentar":kommentar, "gesamtmenge":gesamtmenge})
 	
 	};
+	
+	//send path from server
+	const updatePath=(index)=>{
+		   const formData = new FormData();  //create new form object
+			  formData.append("myImage", versionWerten[index].datei);//add image to form object
+			  axios({
+				method: "post",
+				url: "http://localhost:5000/upload-image",
+				data: formData,  //send image to server
+			  })
+			   .then((response) => {
+				const { data } = response; //return image url of uploaded img
+				//update path in versionWerten state with url
+				let neueVersionWerten = [...versionWerten];
+				neueVersionWerten[index].path= data.url; 
+				setVersionWerten(neueVersionWerten);
+			  })
+			   .catch((err) => {
+				console.log(err);
+			  });	  
+	   }
+	
 	  
+		 
+		
+		 
+		 
+		 let neueVersion = [...medium.versionen];
+		 if (event.target.name==='version'){
+			 neueVersion[index].bezeichnung = event.target.value;
+			 updateVersion([{...medium, versionen:neueVersion}]);
+			 console.log(neueVersion)
+		 }else if(event.target.name==='menge'){
+			 neueVersion[index].menge= event.target.value;
+			 updateVersion([{...medium, versionen:neueVersion}]);
+		 }else if(event.target.name==='datei'){
+			 setIsFileSelected(true);
+			 neueVersion[index].datei= event.target.files[0]; 
+			 updateVersion([{...medium, versionen:neueVersion}]);
+			 //updatePath(index)
+		 }

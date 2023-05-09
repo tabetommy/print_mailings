@@ -1,8 +1,10 @@
 .pal{
 	width: 20%;
+	position: relative;
 }
 .neues-pal{
 	display: flex;
 	align-items: center;
 	cursor: pointer;
+	margin-top: 70px;
 }

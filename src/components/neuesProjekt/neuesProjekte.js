@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useState, useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 import Versionen from './versionen';
 import Medium from './medium';
@@ -11,14 +11,22 @@ import { v4 as uuidv4 } from 'uuid';
 const Neuesprojekt=()=>{
 	
   //set states of elements
-  const [projektWerte, setProjektWerte]= React.useState("");
-  const [unterProjektWerte, setUnterProjektWerte]= React.useState("");
-  const [datum, setDatum]= React.useState(undefined);
-  const [medium,setMedium]=React.useState("");
-  const [versionWerten, setVersionWerten]=React.useState([{id:uuidv4(), datei:null ,path:"" ,version: "", menge:undefined}]);
-  //const [selectedFile, setSelectedFile]=React.useState(null);
-  const [kommentar, setKommentar]= React.useState("");
-  const [gesamtmenge, setGesamtMenge] =React.useState(undefined);
+  const [projektWerte, setProjektWerte]= useState("");
+  const [unterProjektWerte, setUnterProjektWerte]= useState("");
+  const [datum, setDatum]= useState(undefined);
+  const [medium,setMedium]= useState([{
+	  medium_id:uuidv4(),
+	  bezeichnung:"",
+	  kommentar:"",
+	  gesamtmenge:0,
+	  versionen:[{
+		  version_id:uuidv4(), 
+		  bezeichnung: "", 
+		  datei:null ,
+		  path:{} ,
+		  menge:undefined
+	  }]
+  }]);
   
   // options for Oberprojekt and Unterprojekt
   const oberProjektOptionen=["Affinitätenbasierte Mailing Factory","Welcome Strecke","Dekorunde"];
@@ -34,22 +42,29 @@ const Neuesprojekt=()=>{
 		setProjektWerte("");
 		setUnterProjektWerte(" ");
 		setDatum(undefined);
-		setMedium("");
-		setVersionWerten([{ datei:null, version:" ", path:" ", menge:undefined}]);
-		setKommentar("");
-		setGesamtMenge(undefined);
+		setMedium([{
+			medium_id:uuidv4(),
+			bezeichnung:"",
+			gesamtmenge:0,
+			versionen:[{
+				  version_id:uuidv4(), 
+				  bezeichnung: "", 
+				  datei:null ,
+				  path:{} ,
+				  menge:undefined
+			  }]
+		}]);
 	}
-  
   
 	
   //send data to database
   const handleSubmit= async (event)=>{
 	event.preventDefault();
-	const app = new Realm.App({ id: "place app id here" });
+	const app = new Realm.App({ id: "mypracticeapp-zwwer"});
 	const credentials = Realm.Credentials.anonymous();
 	try {
 	  const user = await app.logIn(credentials);
-	  const sendData= user.functions.sendCompleteData(projektWerte, unterProjektWerte,datum, medium, versionWerten,kommentar,gesamtmenge);
+	  const sendData= user.functions.sendCompleteData(projektWerte, unterProjektWerte,datum, medium);
 	  clearInputs();
 	  console.log("submit was succesful")
 	} catch(err) {
@@ -77,7 +92,6 @@ const Neuesprojekt=()=>{
 			{oberProjektOptionen.map(option=><option key={option}>{option}</option>)}
 		</datalist><br/>
 	  </div>
-	  
 	  <div className='main-con'>
 		<label htmlFor='unter-projekt'>Unterprojekt</label><br/>
 		<input list="unter-projekt" 
@@ -90,8 +104,6 @@ const Neuesprojekt=()=>{
 		  {unterProjektOptionen.map(option=><option key={option}>{option}</option> )}  
 		</datalist><br/>
 	  </div>
-	  
-
 	  <div className='main-con pal-medium'>
 		<div className='pal'>
 		  <label htmlFor='pal'>PAL</label><br/>
@@ -101,39 +113,12 @@ const Neuesprojekt=()=>{
 		  onChange={event=>setDatum(event.target.value)}
 		  />
 		</div>
-		<div className='medium'>
-		  <label htmlFor='medium'>Medium</label><br/>
-		  <input type="text" name="medium" id='medium' className='medium-input' value={medium}
-		  placeholder='Bitte Medium eintragen' onChange={event=>setMedium(event.target.value)}/>
-		</div>
 	  </div>
-
-	  <Versionen 
-	  versionWerten={versionWerten} 
-	  setVersionWerten={setVersionWerten} 
-	  />
-
-	  <div className='main-con textarea-con'>
-		<label htmlFor='kommentar'>Kommentar</label><br/>
-		<textarea cols="30" rows="10" name="kommentar"
-		  id="kommentar" className="cm-style" placeholder='Hinweise zum Projekte eintragen'
-		  value={kommentar}
-		  onChange={event=>setKommentar(event.target.value)}
-		  ></textarea>
-	  </div>
-
-	 <div className='main-con  gesamtmenge'>
-		<label htmlFor='gesamt-menge'>Gesamtaussendemenge</label><br/>
-		<input name='gesamt-menge' id='gesamt-menge' 
-		type="number" min="0" 
-		value={gesamtmenge===undefined?'':gesamtmenge} onChange={event=>setGesamtMenge(event.target.value)}/><br/>
-	 </div>
-	  
+	  <Medium medium={medium} setMedium={setMedium}/>
 	  <div className='main-con btn-con'>
 		<button className='pr-speichern' onClick={handleSubmit}>Projekt speichern</button>
 		<span className='verwerfen' onClick={clearInputs}>Verwerfen</span>
 	  </div>
-	  <Medium />
 	</form>
 	
   );
