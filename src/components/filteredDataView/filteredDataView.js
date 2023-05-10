@@ -11,6 +11,7 @@ import Pdf from './Pdf';
 export default function FilteredDataView() {
 	
 	const [filteredData,setFilteredData]= React.useState([]);//filteredata updated by data retrieved from databank
+	const [filteredBymedium, setFilterByMedium]= React.useState({});
 	const [mediumSumme, setMediumSumme]=React.useState()
 	
 	const {projektState}=React.useContext(FilteredValuesContext);
@@ -50,19 +51,47 @@ export default function FilteredDataView() {
 		setMediumSumme(newSum);
 	},[filteredData])
 	
-    console.log(filteredData);
+	
+	// filter the images from filtereddata state by medium name
+	//var filterByMedium=[];
+	/*const filterImages=(event)=>{
+		event.preventDefault();
+		filteredData.map(data=>{
+			return data.medium.map(media=>{
+				if (event.target.id===media.bezeichnung){
+					setFilterByMedium(media)
+				}
+				
+			})
+		})
+	}*/
+	console.log(filteredBymedium);
   return (
 	  <div className="filtered-main">
 	  	<div className="image-con">
-		 {filteredData.map((data,i)=>{
-			 return data.medium.map((media)=>{
-				 return media.versionen.map((version)=>{
-					 return(
-						 <Pdf pdfUrl={version.path.url} key={version.path.imageName}/>
-					 )
-				 })
-			 })
-		 })}
+		  <div className="image-con-btns">
+		  	<button id="Alle" >Alle</button>
+		  	<button id= "Brochure" >Brochure</button>
+		  	<button id= "Brief" >Brief</button>
+		  	<button id= "Flyer" >Fyler</button>
+		  	<button id= "Poster">Poster</button>
+		  </div>
+		  <div className="image-con-pdfs">
+		  {filteredData.map((data,i)=>{
+			   return data.medium.map((media)=>{
+				   return media.versionen.map((version)=>{
+					   return(
+						   <Pdf pdfUrl={version.path.url} key={version.path.imageName}/>
+					   )
+				   })
+			   })
+		   })}
+		  </div>
+		</div>
+		<div className="table-con">
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 		</div>
 	  	{/*<table className="filtered-vals-table">
 		  <thead>

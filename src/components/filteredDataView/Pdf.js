@@ -15,15 +15,9 @@ export default function Test(props) {//props recieved from filtereddataView
 	setPageNumber(1);
   }*/
    
-   const PDFDocumentWrapper = styled.div`
-	 canvas {
-	   width: 100% !important;
-	   height: auto !important;
-	 }
-   `;
   
   return (
-	<PDFDocumentWrapper>
+	
 	  <Document
 		file={props.pdfUrl}
 		>
@@ -32,8 +26,7 @@ export default function Test(props) {//props recieved from filtereddataView
 		renderTextLayer={false}
 		renderAnnotationLayer={false}
 		/>
-		
 	  </Document>
-	</PDFDocumentWrapper>
+	
   );
 }

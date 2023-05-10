@@ -1,6 +1,16 @@
 .filtered-main{
 	display: flex;
 }
+
+.image-con{
+	background-color: #F2F4F8;
+	flex: 2;
+}
+
+.image-con-pdfs{
+	display: flex;
+}
+/*****************tables*******************/
 .filtered-vals-table th{
 	padding: 8px;
 	text-align: left;
@@ -13,19 +23,22 @@
 	flex:1;
 	align-self: flex-start; 
 } 
-.image-con{
-	/*flex: 2;*/
-	
+
+.table-con{
+	background: red;
+	flex:1;
+}
+/************PDFs**********************/
+.react-pdf__Page__canvas {
+	min-width: 100%!important;
+	max-height: auto!important;
+	margin: 0!important;	
 }
 
-.react-pdf__Page__canvas {
-	max-width: 100% !important;
-	width: 100%!important;
-	max-height: 100% !important;
-	width: 100%!important;
-	margin: 0!important;
-	
-	
+.react-pdf__Document{
+	width: 30% !important;
+	height: auto !important;
+	margin: 10px;
 }
 
 /*.react-pdf__Page__canvas {
