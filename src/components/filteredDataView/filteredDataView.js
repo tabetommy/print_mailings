@@ -1,9 +1,9 @@
 import * as React from 'react';
 import * as Realm from 'realm-web';
+import { useRef } from "react";
 import {FilteredValuesContext} from '../globalState';
 import './filteredDataView.css';
-import Pdf from './Pdf';
-//import PdfImage from './Pdf2Image';
+import DownloadForOfflineRoundedIcon from '@mui/icons-material/DownloadForOfflineRounded';
 
 
 	
@@ -11,16 +11,18 @@ import Pdf from './Pdf';
 export default function FilteredDataView() {
 	
 	const [filteredData,setFilteredData]= React.useState([]);//filteredata updated by data retrieved from databank
-	const [filteredBymedium, setFilterByMedium]= React.useState({});
-	const [mediumSumme, setMediumSumme]=React.useState()
+	const [trackMedium, setTrackMedium]=React.useState(["Alle"]);
+	const [mediumSum, setMediumSum]=React.useState();
+	const [numOfBroschüre, setNumOfBroschüre]=React.useState();
+	const [numOfFlyer, setNumOfFlyer]=React.useState();
 	
+	//states from global state using react context	
 	const {projektState}=React.useContext(FilteredValuesContext);
 	const [projekt, setprojekt]=projektState;
 	const {unterprojektState}=React.useContext(FilteredValuesContext);
 	const [unterprojekt, setUnterprojekt]=unterprojektState;
 	const {palState}=React.useContext(FilteredValuesContext);
 	const [pal, setPal]=palState;
-
 	
 	const getFilteredData= async ()=>{
 		const app = new Realm.App({ id: "mypracticeapp-zwwer" });
@@ -42,88 +44,127 @@ export default function FilteredDataView() {
 		}
 	},[projekt,unterprojekt,pal])
 	
-	//add different versions in medium
+	// key track of all medium descriptions(names) to filter images of medium present
 	React.useEffect(()=>{
 		let newSum=0;
-		filteredData.forEach(data=>{
-			newSum += Number(data.gesamtmenge)
+		let broschüreSum=0;
+		let flyerSum=0;
+		filteredData.map(data=>{
+			data.medium.map(medium=>{
+				setTrackMedium(prevState=>[...prevState,medium.bezeichnung]);
+				newSum+=Number(medium.gesamtmenge);//add the gesamtMenge of the different mediums
+				if(medium.bezeichnung==="Brochure"){//get number verions whose medium is brochure
+					broschüreSum=medium.versionen.length
+				}
+				if(medium.bezeichnung==="Flyer"){//get number verions whose medium is flyer
+					flyerSum=medium.versionen.length
+				}
+			})
+			setMediumSum(newSum);
+			setNumOfBroschüre(broschüreSum);
+			setNumOfFlyer(flyerSum);
 		})
-		setMediumSumme(newSum);
 	},[filteredData])
 	
+	// filter displayed image by clicked button argument
+	const filterImages=(type)=>{
+		//check all filter elements. if 
+		if(trackMedium.includes(type)){
+			
+			let filterImages = document.querySelectorAll('.image-con-imgs-con');
+			filterImages.forEach( element => element.classList.add('hidden') );
+			let unFilterImages = document.querySelectorAll('.'+type);
+			unFilterImages.forEach( element => element.classList.remove('hidden') );
+			/*let selectedBtn = document.querySelectorAll('.btn');
+			selectedBtn.forEach( element => element?element.classList.add('clicked-btn') );*/
+			
+		}
+		
+	}
 	
-	// filter the images from filtereddata state by medium name
-	//var filterByMedium=[];
-	/*const filterImages=(event)=>{
-		event.preventDefault();
-		filteredData.map(data=>{
-			return data.medium.map(media=>{
-				if (event.target.id===media.bezeichnung){
-					setFilterByMedium(media)
-				}
-				
-			})
-		})
-	}*/
-	console.log(filteredBymedium);
   return (
 	  <div className="filtered-main">
 	  	<div className="image-con">
 		  <div className="image-con-btns">
-		  	<button id="Alle" >Alle</button>
-		  	<button id= "Brochure" >Brochure</button>
-		  	<button id= "Brief" >Brief</button>
-		  	<button id= "Flyer" >Fyler</button>
-		  	<button id= "Poster">Poster</button>
+		  	<button  onClick={()=>filterImages('Alle')} className="btn">Alle</button>
+		  	<button  onClick={()=>filterImages('Brochure')} className="btn">Brochure</button>
+		  	<button  onClick={()=>filterImages('Brief')} className="btn">Brief</button>
+		  	<button  onClick={()=>filterImages('Flyer')} className="btn">Fyler</button>
+		  	<button  onClick={()=>filterImages('Poster')} className="btn">Poster</button>
 		  </div>
-		  <div className="image-con-pdfs">
-		  {filteredData.map((data,i)=>{
-			   return data.medium.map((media)=>{
-				   return media.versionen.map((version)=>{
-					   return(
-						   <Pdf pdfUrl={version.path.url} key={version.path.imageName}/>
-					   )
-				   })
-			   })
-		   })}
+		  <div className="image-con-imgs">
+	  		{
+		  		filteredData.map(data=>{
+					  return data.medium.map(medium=>{
+						  return medium.versionen.map(version=>{
+							  return (
+								  <div className={"image-con-imgs-con Alle "+ medium.bezeichnung} key={version.path.name}>
+									<img src={version.path.imageUrl} className="image"/>
+									<div className="anchor">
+										<a href={version.path.pdfUrl} target="_blank">
+											<DownloadForOfflineRoundedIcon style={{ color: '#2600F2',fontSize: 70 }}/>
+										</a>
+									</div>
+								  </div>
+							  )
+						  })
+					  })
+				  })
+	  		}
 		  </div>
 		</div>
 		<div className="table-con">
-			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+			<table className="filtered-vals-table">
+			  <thead>
+				   { filteredData.length >0 ?
+				  <tr>
+					<th>Medium</th>
+					<th>Versionierung</th>
+					<th>Versandmenge</th>
+				  </tr>:
+				  null
+				 }
+			  </thead>
+			  <tbody>
+				{filteredData.map(data=>{
+					return data.medium.map(med=>{
+						return med.versionen.map((version,i)=>{
+							return(
+								med.bezeichnung==="Brochure" && i===(numOfBroschüre-1)?
+								<tr key={version.version_id} style={{borderBottom:'1px solid rgb(69, 37, 242)'}}>
+									<td>{med.bezeichnung}</td>
+									<td>{version.bezeichnung}</td>
+									<td>{version.menge}</td>
+								</tr>
+								:
+								med.bezeichnung==="Flyer" && i===(numOfFlyer-1)?
+								<tr key={version.version_id} style={{borderBottom:'1px solid rgb(69, 37, 242)'}} >
+									<td>{med.bezeichnung}</td>
+									<td>{version.bezeichnung}</td>
+									<td>{version.menge}</td>
+								</tr>
+								:
+								<tr key={version.version_id}>
+									<td>{med.bezeichnung}</td>
+									<td>{version.bezeichnung}</td>
+									<td>{version.menge}</td>
+								</tr>
+							)
+						})
+					}
+					)
+				})}
+				{ filteredData.length >0?
+					<tr>
+						<td>Gesamtmenge</td>
+						<td></td>
+						<td>{mediumSum}</td>
+					</tr>:
+					null
+				}
+			  </tbody>
+			  </table>
 		</div>
-	  	{/*<table className="filtered-vals-table">
-		  <thead>
-		  	 { filteredData.length >0 ?
-			  <tr>
-				<th>Medium</th>
-				<th>Versionierung</th>
-				<th>Versandmenge</th>
-			  </tr>:
-			  null
-		     }
-		  </thead>
-		  <tbody>
-			{filteredData.map((data)=>{
-				return data.versionen.map((version,i)=>(
-					<tr key={i}>
-						<td>{data.medium}</td>
-						<td>{version.version}</td>
-						<td>{version.menge}</td>
-					</tr>
-				))
-			})}
-			{ filteredData.length >0?
-				<tr>
-					<td>Gesamtmenge</td>
-					<td></td>
-					<td>{mediumSumme}</td>
-				</tr>:
-				null
-			}
-		  </tbody>
-	  	</table>*/}
 	  </div>
 	  
   );

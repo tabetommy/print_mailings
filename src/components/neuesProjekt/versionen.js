@@ -86,9 +86,7 @@ const Version=({medium, updateVersion, mediumState, medium_index})=>{
 		})
 		.catch((err)=>{
 			console.log(err)
-		})
-		
-		
+		})	
    }
    
    const addVersion=(event)=>{// add a new versionen

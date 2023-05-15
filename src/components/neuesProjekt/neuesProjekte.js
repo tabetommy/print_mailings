@@ -23,7 +23,7 @@ const Neuesprojekt=()=>{
 		  version_id:uuidv4(), 
 		  bezeichnung: "", 
 		  datei:null ,
-		  path:{} ,
+		  path:{},
 		  menge:undefined
 	  }]
   }]);
