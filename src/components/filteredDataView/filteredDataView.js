@@ -15,6 +15,9 @@ export default function FilteredDataView() {
 	const [mediumSum, setMediumSum]=React.useState();
 	const [numOfBroschüre, setNumOfBroschüre]=React.useState();
 	const [numOfFlyer, setNumOfFlyer]=React.useState();
+	const [numOfPosters, setNumOfPosters]=React.useState();
+	const [numOfBrief, setNumOfBrief]=React.useState();
+	
 	
 	//states from global state using react context	
 	const {projektState}=React.useContext(FilteredValuesContext);
@@ -37,7 +40,27 @@ export default function FilteredDataView() {
 		
 	}
 	
-	//display filtered values or not
+	// get all data before component mounts
+	const getData= async ()=>{
+		const app = new Realm.App({ id: "mypracticeapp-zwwer" });
+		const credentials = Realm.Credentials.anonymous();
+		try {
+		  const user = await app.logIn(credentials);
+		  const allData= user.functions.getAllData();
+		  allData.then(resp=>setFilteredData(resp));
+		} catch(err) {
+		  console.error("Failed to log in", err);
+		}
+		
+	}
+	
+	//get all data before component mounts dom
+	React.useEffect(()=>{
+		getData()
+	},[])
+	
+	
+	//run get query only when all filtr data are available
 	React.useEffect(()=>{
 		if( projekt && unterprojekt && pal){
 			getFilteredData()
@@ -49,48 +72,80 @@ export default function FilteredDataView() {
 		let newSum=0;
 		let broschüreSum=0;
 		let flyerSum=0;
+		let posterSum=0;
+		let briefSum=0;
 		filteredData.map(data=>{
 			data.medium.map(medium=>{
 				setTrackMedium(prevState=>[...prevState,medium.bezeichnung]);
 				newSum+=Number(medium.gesamtmenge);//add the gesamtMenge of the different mediums
-				if(medium.bezeichnung==="Brochure"){//get number verions whose medium is brochure
-					broschüreSum=medium.versionen.length
-				}
-				if(medium.bezeichnung==="Flyer"){//get number verions whose medium is flyer
-					flyerSum=medium.versionen.length
+				switch (medium.bezeichnung) {
+					case "Brochure":
+					broschüreSum=medium.versionen.length;
+					break;
+					case "Flyer":
+					flyerSum=medium.versionen.length;
+					break;
+					case "Poster":
+					posterSum=medium.versionen.length;
+					break;
+					case "Brief":
+					briefSum=medium.versionen.length;
+					break;
+					default:
+					console.log("default")
 				}
 			})
 			setMediumSum(newSum);
 			setNumOfBroschüre(broschüreSum);
 			setNumOfFlyer(flyerSum);
+			setNumOfPosters(posterSum);
+			setNumOfBrief(briefSum);
 		})
 	},[filteredData])
 	
+	
+	
 	// filter displayed image by clicked button argument
-	const filterImages=(type)=>{
-		//check all filter elements. if 
+	const filterImages=(type, btnType)=>{
+		//check all filter elements. Filter only if the clicked button is present in track medium, 
 		if(trackMedium.includes(type)){
-			
 			let filterImages = document.querySelectorAll('.image-con-imgs-con');
 			filterImages.forEach( element => element.classList.add('hidden') );
 			let unFilterImages = document.querySelectorAll('.'+type);
 			unFilterImages.forEach( element => element.classList.remove('hidden') );
-			/*let selectedBtn = document.querySelectorAll('.btn');
-			selectedBtn.forEach( element => element?element.classList.add('clicked-btn') );*/
 			
 		}
-		
+		//change button style onclick
+		let filterBtns=document.querySelectorAll('.btn');
+		filterBtns.forEach(element=>element.style.cssText=`background:#FFF ;color: rgb(69, 37, 242)`)
+		let unFilterBtns = document.querySelectorAll('.'+btnType);
+		unFilterBtns.forEach(element=>element.style.cssText=`background: rgb(69, 37, 242);color: #FFF`)	
+			
 	}
 	
   return (
 	  <div className="filtered-main">
 	  	<div className="image-con">
 		  <div className="image-con-btns">
-		  	<button  onClick={()=>filterImages('Alle')} className="btn">Alle</button>
-		  	<button  onClick={()=>filterImages('Brochure')} className="btn">Brochure</button>
-		  	<button  onClick={()=>filterImages('Brief')} className="btn">Brief</button>
-		  	<button  onClick={()=>filterImages('Flyer')} className="btn">Fyler</button>
-		  	<button  onClick={()=>filterImages('Poster')} className="btn">Poster</button>
+		    <button  onClick={()=>filterImages('Alle', 'all')} className="btn all alleBtn">Alle</button>
+		  	{
+				  filteredData.map(data=>{
+					  return data.medium.map(medium=>{
+						  return (
+							  <button 
+							  key={medium.medium_id}
+							  onClick={()=>filterImages(medium.bezeichnung,medium.bezeichnung.slice(0, 3))}
+							  className={"btn " + medium.bezeichnung.slice(0, 3)}
+							  >{medium.bezeichnung}</button>
+						  )
+					  })
+				  })
+			  }
+		  	{/*<button  onClick={()=>filterImages('Alle', 'all')} className="btn all">Alle</button>
+		  	<button  onClick={()=>filterImages('Brochure','bch')} className="btn bch">Brochure</button>
+		  	<button  onClick={()=>filterImages('Brief', 'brf')} className="btn brf">Brief</button>
+		  	<button  onClick={()=>filterImages('Flyer', 'flr')} className="btn flr">Fyler</button>
+		  	<button  onClick={()=>filterImages('Poster', 'pst')} className="btn pst">Poster</button>*/}
 		  </div>
 		  <div className="image-con-imgs">
 	  		{
@@ -98,7 +153,7 @@ export default function FilteredDataView() {
 					  return data.medium.map(medium=>{
 						  return medium.versionen.map(version=>{
 							  return (
-								  <div className={"image-con-imgs-con Alle "+ medium.bezeichnung} key={version.path.name}>
+								  <div className={"image-con-imgs-con Alle "+ medium.bezeichnung} key={version.version_id}>
 									<img src={version.path.imageUrl} className="image"/>
 									<div className="anchor">
 										<a href={version.path.pdfUrl} target="_blank">
@@ -138,6 +193,20 @@ export default function FilteredDataView() {
 								</tr>
 								:
 								med.bezeichnung==="Flyer" && i===(numOfFlyer-1)?
+								<tr key={version.version_id} style={{borderBottom:'1px solid rgb(69, 37, 242)'}} >
+									<td>{med.bezeichnung}</td>
+									<td>{version.bezeichnung}</td>
+									<td>{version.menge}</td>
+								</tr>
+								:
+								med.bezeichnung==="Poster" && i===(numOfPosters-1)?
+								<tr key={version.version_id} style={{borderBottom:'1px solid rgb(69, 37, 242)'}} >
+									<td>{med.bezeichnung}</td>
+									<td>{version.bezeichnung}</td>
+									<td>{version.menge}</td>
+								</tr>
+								:
+								med.bezeichnung==="Brief" && i===(numOfBrief-1)?
 								<tr key={version.version_id} style={{borderBottom:'1px solid rgb(69, 37, 242)'}} >
 									<td>{med.bezeichnung}</td>
 									<td>{version.bezeichnung}</td>

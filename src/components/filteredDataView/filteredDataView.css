@@ -1,6 +1,7 @@
 .filtered-main{
 	display: flex;
 	justify-content: space-between;
+	column-gap: 30px;
 	
 }
 
@@ -18,8 +19,8 @@
 .image-con-imgs-con {
 	width:30%;
 	position: relative;
-	margin-right:16px;
-	margin-top: 16px;
+	margin-right:20px;
+	margin-top: 20px;
 	margin-bottom: 16px;
 	box-shadow: 2px 2px 10px  #888888;
 	cursor: pointer;
@@ -39,7 +40,8 @@
   height: auto;
   display: block;
   backface-visibility: hidden;
-  transition: .5s ease;
+  /*transition: .5s ease;*/
+  transition: all .5s ease-in-out; 
 }
 
 
@@ -48,6 +50,9 @@
 }
 
 
+.image:hover{
+	transform: scale(1.1); 
+}
 
 .image-con-imgs-con:hover {
 	opacity: 0.7;
@@ -75,9 +80,9 @@
 	
 }
 
-.clicked-btn{
+.alleBtn{
 	background: rgb(69, 37, 242);
-	color: #FFF
+	color: #FFF;
 }
 
 
