@@ -4,10 +4,8 @@ import './main.css';
 
 
 //PDFjs worker from an external cdn
-const url = "http://localhost:5000/image/1683198360946.pdf"
   
-export default function Test() {
-	  
+export default function PdfFile() {
 	pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 	 const [numPages, setNumPages] = useState(null);
 	  const [pageNumber, setPageNumber] = useState(1);
@@ -18,7 +16,7 @@ export default function Test() {
   }
   return (
 	<>
-	<div className="main">
+	{/*<div className="main">*/}
 	  <Document
 		file={url}
 		onLoadSuccess={onDocumentLoadSuccess}
@@ -29,7 +27,6 @@ export default function Test() {
 		renderAnnotationLayer={false}
 		/>
 	  </Document>
-	 </div>
 	</>
   );
 }

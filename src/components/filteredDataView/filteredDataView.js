@@ -1,22 +1,33 @@
 import * as React from 'react';
 import * as Realm from 'realm-web';
-import { useRef } from "react";
 import {FilteredValuesContext} from '../globalState';
 import './filteredDataView.css';
 import DownloadForOfflineRoundedIcon from '@mui/icons-material/DownloadForOfflineRounded';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 
-	
 
 export default function FilteredDataView() {
 	
+	//modal functions
+	const [open, setOpen] = React.useState(false);
+	const handleOpen = (url) => {
+		setOpen(true);
+		console.log(url)
+	}
+	const handleClose = () => setOpen(false);
+	  
+	//other functions
+	
 	const [filteredData,setFilteredData]= React.useState([]);//filteredata updated by data retrieved from databank
 	const [trackMedium, setTrackMedium]=React.useState(["Alle"]);
+	const [trackPals, setTrackPals]=React.useState([]);
 	const [mediumSum, setMediumSum]=React.useState();
 	const [numOfBroschüre, setNumOfBroschüre]=React.useState();
 	const [numOfFlyer, setNumOfFlyer]=React.useState();
 	const [numOfPosters, setNumOfPosters]=React.useState();
 	const [numOfBrief, setNumOfBrief]=React.useState();
+	const [chartData, setChartData]=React.useState([]);
 	
 	
 	//states from global state using react context	
@@ -74,10 +85,11 @@ export default function FilteredDataView() {
 		let flyerSum=0;
 		let posterSum=0;
 		let briefSum=0;
-		filteredData.map(data=>{
+		filteredData.map((data,i)=>{
 			data.medium.map(medium=>{
-				setTrackMedium(prevState=>[...prevState,medium.bezeichnung]);
+				setTrackMedium(prevState=>[...prevState,medium.bezeichnung]);//track medium values to to limit button filter
 				newSum+=Number(medium.gesamtmenge);//add the gesamtMenge of the different mediums
+				//function to determine last medium to draw line.
 				switch (medium.bezeichnung) {
 					case "Brochure":
 					broschüreSum=medium.versionen.length;
@@ -94,12 +106,15 @@ export default function FilteredDataView() {
 					default:
 					console.log("default")
 				}
-			})
+				
+			});
 			setMediumSum(newSum);
 			setNumOfBroschüre(broschüreSum);
 			setNumOfFlyer(flyerSum);
 			setNumOfPosters(posterSum);
 			setNumOfBrief(briefSum);
+			
+			
 		})
 	},[filteredData])
 	
@@ -123,7 +138,51 @@ export default function FilteredDataView() {
 			
 	}
 	
+	
+	
+	/*let newData=filteredData
+	let result=newData.reduce((acc,cur)=>{
+		let newObj={name:"", Gesamtmenge:0}
+		let found=acc.some(ele=>ele.pal===cur.pal)
+		if (found){
+			let index=acc.findIndex(ac=>ac.pal===cur.pal);
+			acc[index].medium[0].gesamtmenge=acc[index].medium[0].gesamtmenge + cur.medium[0].gesamtmenge;
+		}else{
+			acc.push(cur)
+		}
+		return acc
+	},[])*/
+	let arr=[]
+	React.useEffect(()=>{
+		let result=filteredData.reduce(function(acc, v) {
+		  acc[v.pal] = (acc[v.pal] || 0) + v.medium[0].gesamtmenge 
+		  return acc
+		}, {})
+		Object.keys(result).map(key => {
+			console.log(`${key} and ${result[key]}`)
+			//let arr=[]
+			arr.push({name:key, Gesamtmenge:result[key]})
+			setChartData(arr)
+			
+		})
+	},[filteredData]);
+	
+	const CustomizedAxisTick =(props)=> {
+	
+		const { x, y, stroke, payload } =props;
+	
+		return (
+		  <g transform={`translate(${x},${y})`}>
+			<text x={0} y={0} dy={16} textAnchor="end" fill="#666" transform="rotate(-20)">
+			  {payload.value}
+			</text>
+		  </g>
+		);
+	  }
+	
+	
   return (
+	  <div>
 	  <div className="filtered-main">
 	  	<div className="image-con">
 		  <div className="image-con-btns">
@@ -141,11 +200,6 @@ export default function FilteredDataView() {
 					  })
 				  })
 			  }
-		  	{/*<button  onClick={()=>filterImages('Alle', 'all')} className="btn all">Alle</button>
-		  	<button  onClick={()=>filterImages('Brochure','bch')} className="btn bch">Brochure</button>
-		  	<button  onClick={()=>filterImages('Brief', 'brf')} className="btn brf">Brief</button>
-		  	<button  onClick={()=>filterImages('Flyer', 'flr')} className="btn flr">Fyler</button>
-		  	<button  onClick={()=>filterImages('Poster', 'pst')} className="btn pst">Poster</button>*/}
 		  </div>
 		  <div className="image-con-imgs">
 	  		{
@@ -154,7 +208,7 @@ export default function FilteredDataView() {
 						  return medium.versionen.map(version=>{
 							  return (
 								  <div className={"image-con-imgs-con Alle "+ medium.bezeichnung} key={version.version_id}>
-									<img src={version.path.imageUrl} className="image"/>
+									<img src={version.path.imageUrl} className="image" onClick={()=>handleOpen(version.path.pdfUrl)}/>					
 									<div className="anchor">
 										<a href={version.path.pdfUrl} target="_blank">
 											<DownloadForOfflineRoundedIcon style={{ color: '#2600F2',fontSize: 70 }}/>
@@ -234,6 +288,16 @@ export default function FilteredDataView() {
 			  </tbody>
 			  </table>
 		</div>
+	  </div>
+	  	<LineChart width={1000} height={250} data={chartData}
+			margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+			<CartesianGrid strokeDasharray="3 3" />
+			<XAxis dataKey="name" tick={<CustomizedAxisTick />}/>
+			<YAxis />
+			<Tooltip />
+			<Legend />
+			<Line type="monotone" dataKey="Gesamtmenge" stroke="rgb(69, 37, 242)" />
+	  	</LineChart>
 	  </div>
 	  
   );

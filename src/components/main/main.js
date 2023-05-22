@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useState} from 'react';
 import Projekt from '../projekt/projekt';
 import Unterprojekt from '../unterprojekt/unterprojekt';
 import Pal from '../pal/pal';
@@ -12,6 +12,7 @@ import axios from 'axios';
 
 
 const MainComponent=()=>{	
+	
 	return(
 		<div className='main-container'>
 			<FilteredValuesProvider>
@@ -24,6 +25,7 @@ const MainComponent=()=>{
 				<FilteredValues />
 				<FilteredDataView />
 			</FilteredValuesProvider>
+			
 		</div>
 	)
 }
