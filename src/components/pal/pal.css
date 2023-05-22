@@ -8,3 +8,14 @@
 	cursor: pointer;
 	margin-top: 70px;
 }
+input[type="date"]{
+border-radius: 30px;
+  background-color:rgb(69, 37, 242);
+  color: white;
+  position: absolute;
+  top:45px;
+  z-index: 100;
+  width: 90%;
+  padding:18px;
+  margin-top: 0;
+}

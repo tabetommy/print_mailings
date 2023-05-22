@@ -7,6 +7,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 
 
 
+
 export default function FilteredDataView() {
 	
 	//modal functions
@@ -21,7 +22,7 @@ export default function FilteredDataView() {
 	
 	const [filteredData,setFilteredData]= React.useState([]);//filteredata updated by data retrieved from databank
 	const [trackMedium, setTrackMedium]=React.useState(["Alle"]);
-	const [trackPals, setTrackPals]=React.useState([]);
+	const [subData, setSubData]=React.useState([]);
 	const [mediumSum, setMediumSum]=React.useState();
 	const [numOfBroschüre, setNumOfBroschüre]=React.useState();
 	const [numOfFlyer, setNumOfFlyer]=React.useState();
@@ -51,6 +52,15 @@ export default function FilteredDataView() {
 		
 	}
 	
+	//get date range to display pal for the last 2 months
+	const filterDatabyPal=(data)=>{
+		const fromDate = new Date().getTime() / 1000;
+		const untilDate = new Date().setDate(new Date().getDate() - 30)/1000;
+		let filteredPal=data.filter(data=>(new Date(data.pal).getTime() / 1000)<=  fromDate && (new Date(data.pal).getTime() / 1000)>=untilDate)
+		setSubData(filteredPal);
+	}
+	
+	
 	// get all data before component mounts
 	const getData= async ()=>{
 		const app = new Realm.App({ id: "mypracticeapp-zwwer" });
@@ -58,7 +68,10 @@ export default function FilteredDataView() {
 		try {
 		  const user = await app.logIn(credentials);
 		  const allData= user.functions.getAllData();
-		  allData.then(resp=>setFilteredData(resp));
+		  allData.then(resp=>{
+			  setFilteredData(resp);
+			  filterDatabyPal(resp);
+		  });
 		} catch(err) {
 		  console.error("Failed to log in", err);
 		}
@@ -152,15 +165,14 @@ export default function FilteredDataView() {
 		}
 		return acc
 	},[])*/
+	//from filtered data get last two months
 	let arr=[]
 	React.useEffect(()=>{
-		let result=filteredData.reduce(function(acc, v) {
+		let result=subData.reduce(function(acc, v) {
 		  acc[v.pal] = (acc[v.pal] || 0) + v.medium[0].gesamtmenge 
 		  return acc
 		}, {})
 		Object.keys(result).map(key => {
-			console.log(`${key} and ${result[key]}`)
-			//let arr=[]
 			arr.push({name:key, Gesamtmenge:result[key]})
 			setChartData(arr)
 			
@@ -179,7 +191,6 @@ export default function FilteredDataView() {
 		  </g>
 		);
 	  }
-	
 	
   return (
 	  <div>
@@ -292,7 +303,7 @@ export default function FilteredDataView() {
 	  	<LineChart width={1000} height={250} data={chartData}
 			margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
 			<CartesianGrid strokeDasharray="3 3" />
-			<XAxis dataKey="name" tick={<CustomizedAxisTick />}/>
+			<XAxis dataKey="name" tick={<CustomizedAxisTick />} />
 			<YAxis />
 			<Tooltip />
 			<Legend />
