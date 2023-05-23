@@ -3,7 +3,6 @@ import {useNavigate} from 'react-router-dom';
 import Versionen from './versionen';
 import Medium from './medium';
 import './neuesProjekt.css';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import * as Realm from 'realm-web';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -75,10 +74,6 @@ const Neuesprojekt=()=>{
 
   return (
 	<form className='App-con'>
-	  <div className='neuesprojekt-return' onClick={()=>navigate('/')}>
-	    <ArrowBackIcon />
-	    <p>züruck zur Übersicht</p>
-	  </div>
 	  <h1>Neues projekt erstellen</h1>
 	  <div className='main-con'>
 		<label htmlFor='ober-project' >Oberprojekt</label><br/>

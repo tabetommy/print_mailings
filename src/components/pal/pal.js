@@ -25,7 +25,7 @@ const Pal=()=>{
 	  	<p>Pal</p>
 	  	{/*<PalSelect data={data}/>*/}
 		{/*<label htmlFor="pal">Pal</label><br/> */}
-		<input type="date" id="pal" name="pal" onChange={handleChange}/>
+		<input type="date" id="pal-state" name="pal" onChange={handleChange}/>
 	  	<div className='neues-pal'>
 			<AddIcon />
 			<span>Neues Pal</span>

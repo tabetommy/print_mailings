@@ -72,6 +72,10 @@ input{
   width: 60%;
 } 
 
+.medium{
+  width: 50%;
+} 
+
 .versandmenge{
   width: 20%;
 }
@@ -104,6 +108,7 @@ textarea{
   background-color: rgb(69, 37, 242);
   color: white;
   padding: 13px 23px;
+  cursor: pointer;
 }
 
 .verwerfen{
@@ -113,6 +118,7 @@ textarea{
   color: rgb(69, 37, 242);
   padding: 13px 23px;
   font-weight: 700;
+  cursor: pointer;
 }
 
 .gesamtmenge input{

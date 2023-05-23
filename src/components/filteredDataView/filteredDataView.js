@@ -19,9 +19,9 @@ export default function FilteredDataView() {
 	const handleClose = () => setOpen(false);
 	  
 	//other functions
-	
+	//const [allData, setAllData]= React.useState([]);
 	const [filteredData,setFilteredData]= React.useState([]);//filteredata updated by data retrieved from databank
-	const [trackMedium, setTrackMedium]=React.useState(["Alle"]);
+	const [trackMedium, setTrackMedium]=React.useState([]);
 	const [subData, setSubData]=React.useState([]);
 	const [mediumSum, setMediumSum]=React.useState();
 	const [numOfBroschüre, setNumOfBroschüre]=React.useState();
@@ -91,6 +91,7 @@ export default function FilteredDataView() {
 		}
 	},[projekt,unterprojekt,pal])
 	
+	
 	// key track of all medium descriptions(names) to filter images of medium present
 	React.useEffect(()=>{
 		let newSum=0;
@@ -98,9 +99,13 @@ export default function FilteredDataView() {
 		let flyerSum=0;
 		let posterSum=0;
 		let briefSum=0;
+		let mediumArr=["Alle"];
 		filteredData.map((data,i)=>{
 			data.medium.map(medium=>{
-				setTrackMedium(prevState=>[...prevState,medium.bezeichnung]);//track medium values to to limit button filter
+				if(!mediumArr.includes(medium.bezeichnung)){
+					mediumArr.push(medium.bezeichnung)	
+				}
+				//setTrackMedium(prevState=>[...prevState,medium.bezeichnung]);//track medium values to to limit button filter
 				newSum+=Number(medium.gesamtmenge);//add the gesamtMenge of the different mediums
 				//function to determine last medium to draw line.
 				switch (medium.bezeichnung) {
@@ -126,7 +131,7 @@ export default function FilteredDataView() {
 			setNumOfFlyer(flyerSum);
 			setNumOfPosters(posterSum);
 			setNumOfBrief(briefSum);
-			
+			setTrackMedium(mediumArr);
 			
 		})
 	},[filteredData])
@@ -153,19 +158,7 @@ export default function FilteredDataView() {
 	
 	
 	
-	/*let newData=filteredData
-	let result=newData.reduce((acc,cur)=>{
-		let newObj={name:"", Gesamtmenge:0}
-		let found=acc.some(ele=>ele.pal===cur.pal)
-		if (found){
-			let index=acc.findIndex(ac=>ac.pal===cur.pal);
-			acc[index].medium[0].gesamtmenge=acc[index].medium[0].gesamtmenge + cur.medium[0].gesamtmenge;
-		}else{
-			acc.push(cur)
-		}
-		return acc
-	},[])*/
-	//from filtered data get last two months
+	// reduce subData to pals and gesamtmenge sum
 	let arr=[]
 	React.useEffect(()=>{
 		let result=subData.reduce(function(acc, v) {
@@ -192,13 +185,28 @@ export default function FilteredDataView() {
 		);
 	  }
 	
+	
+	
   return (
 	  <div>
 	  <div className="filtered-main">
 	  	<div className="image-con">
 		  <div className="image-con-btns">
-		    <button  onClick={()=>filterImages('Alle', 'all')} className="btn all alleBtn">Alle</button>
-		  	{
+		    {/*<button  onClick={()=>filterImages('Alle', 'all')} className="btn all alleBtn">Alle</button>*/}
+            {
+				trackMedium.map(medium=>{
+					return(
+						<button 
+						  key={medium}
+						  onClick={()=>filterImages(medium,medium.slice(0, 3))}
+						  className={"btn " + medium.slice(0, 3)}
+						  >
+						  {medium}
+						</button>
+					)
+				})
+			}
+		  	{/*
 				  filteredData.map(data=>{
 					  return data.medium.map(medium=>{
 						  return (
@@ -210,7 +218,7 @@ export default function FilteredDataView() {
 						  )
 					  })
 				  })
-			  }
+			  */}
 		  </div>
 		  <div className="image-con-imgs">
 	  		{
@@ -300,15 +308,20 @@ export default function FilteredDataView() {
 			  </table>
 		</div>
 	  </div>
-	  	<LineChart width={1000} height={250} data={chartData}
-			margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-			<CartesianGrid strokeDasharray="3 3" />
-			<XAxis dataKey="name" tick={<CustomizedAxisTick />} />
-			<YAxis />
-			<Tooltip />
-			<Legend />
-			<Line type="monotone" dataKey="Gesamtmenge" stroke="rgb(69, 37, 242)" />
-	  	</LineChart>
+	  <div className="diagram">
+	  	{
+		  chartData.length>0? <LineChart width={800} height={250} data={chartData}>
+			  <CartesianGrid strokeDasharray="3 3" />
+			  <XAxis dataKey="name" />
+			  <YAxis />
+			  <Tooltip />
+			  <Legend verticalAlign="bottom" height={36}/>
+			  <Line type="monotone" dataKey="Gesamtmenge" stroke="rgb(69, 37, 242)" />
+			</LineChart>	
+			:
+			null
+	  	}
+	  </div>
 	  </div>
 	  
   );

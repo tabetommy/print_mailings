@@ -8,7 +8,7 @@
 	cursor: pointer;
 	margin-top: 70px;
 }
-input[type="date"]{
+#pal-state{
 border-radius: 30px;
   background-color:rgb(69, 37, 242);
   color: white;

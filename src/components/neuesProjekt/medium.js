@@ -31,7 +31,7 @@ const Medium=({medium, setMedium})=>{
 			medium.map((data,index)=>{
 				return(
 					<div key={data.medium_id} >
-						<div className='medium'>
+						<div className='medium main-con'>
 							  <label htmlFor='medium'>Medium</label><br/>
 							  <input type="text" name="medium" id='medium' className='medium-input'
 							  placeholder='Bitte Medium eintragen'
