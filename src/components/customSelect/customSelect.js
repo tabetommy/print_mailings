@@ -1,8 +1,10 @@
 import React,{useContext} from 'react';
-import './customSelect.css';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {FilteredValuesContext} from '../globalState';
-
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+import './customSelect.css';
+import moment from 'moment';
 
 // custom select tag for project(seperate them because of need of seperate states)
 export const ProjektSelect= ({data}) => {
@@ -104,9 +106,8 @@ export const UnterProjektSelect= ({data}) => {
 
 //custom pal select tag
 
-export const PalSelect= ({data}) => {
+export const PalSelect= ({dates}) => {
   const [isOpen, setOpen] = React.useState(false);
-  const [items, setItem] = React.useState(data);
   const [selectedItem, setSelectedItem] = React.useState(null);
   
   const {palState}=useContext(FilteredValuesContext);
@@ -114,39 +115,24 @@ export const PalSelect= ({data}) => {
 	
   const toggleDropdown = () => setOpen(!isOpen);
   
-  const handleItemClick = (id) => { 
-	  //seperate state for different values
-	selectedItem == id ? setSelectedItem(null) : setSelectedItem(id);
-	updateItemValue(id);
-	setOpen(!isOpen);
-  }
-  const updateItemValue=(id)=>{
-		const newItem=items.find(item=>item.id==id).label;
-		//updateState(newItem);
-		//setProjekt(newItem);
-		setPal(newItem);
-	}
-	
+  //const dates=["2023-05-12","2023-05-23", "2023-05-25", "2023-05-30" ];
   return (
 	<div className='dropdown'>
 	  <div className='dropdown-header' onClick={toggleDropdown}>
-		  {/* when item has been selected from dropdown, selectedItem state is updated, the 
-			  item is found by id from the item(data) state and label of the found its displayed
-			  */}
-		{selectedItem ? items.find(item => item.id == selectedItem).label : "Pals"}
+		 
+		{pal?moment(pal).format("YYYY-MM-DD"):"Pals"}
 		<ExpandMoreIcon />
-		{/*<i className={`fa fa-chevron-right icon ${isOpen && "open"}`}></i>*/}
 	  </div>
-	  <div className={`dropdown-body ${isOpen && 'open'}`}>
-		{items.map(item => (
-		  <div className="dropdown-item" 
-		  onClick={e=>handleItemClick(e.target.id)} 
-		  id={item.id}
-		  key={item.id}
-		  >
-			{item.label}
-		  </div>
-		))}
+	  <div className={`dropdown-body-pal ${isOpen && 'open'}`}>
+		<Calendar 
+		value={pal}
+		onChange={setPal} 
+		  tileClassName={({date, view})=>{
+			if(dates.find(x=>x===moment(date).format("YYYY-MM-DD"))){
+			 return  'highlight'
+			}
+		  }}
+		  />
 	  </div>
 	</div>
   )

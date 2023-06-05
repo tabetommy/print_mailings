@@ -73,48 +73,48 @@ const Neuesprojekt=()=>{
   
 
   return (
-	<form className='App-con'>
-	  <h1>Neues projekt erstellen</h1>
-	  <div className='main-con'>
-		<label htmlFor='ober-project' >Oberprojekt</label><br/>
-		<input list="ober-projekt" 
-		value={projektWerte}
-		name="ober-projekt" 
-		onChange={event=>setProjektWerte(event.target.value)}
-		placeholder="Bitte Oberprojekt eintragen oder auswählen"
-		className='input'/>    
-		<datalist id="ober-projekt">
-			{oberProjektOptionen.map(option=><option key={option}>{option}</option>)}
-		</datalist><br/>
-	  </div>
-	  <div className='main-con'>
-		<label htmlFor='unter-projekt'>Unterprojekt</label><br/>
-		<input list="unter-projekt" 
-		value={unterProjektWerte}
-		name="unter-projekt" 
-		onChange={event=>setUnterProjektWerte(event.target.value)}
-		placeholder="Bitte Unterprojekt eintragen oder auswählen"
-		className='input'/>    
-		<datalist id="unter-projekt">
-		  {unterProjektOptionen.map(option=><option key={option}>{option}</option> )}  
-		</datalist><br/>
-	  </div>
-	  <div className='main-con pal-medium'>
-		<div className='pal'>
-		  <label htmlFor='pal'>PAL</label><br/>
-		  <input type="date" name="pal" id='pal' className='pal-input' 
-		  max={today}
-		  value={datum===undefined?'':datum}
-		  onChange={event=>setDatum(event.target.value)}
-		  />
-		</div>
-	  </div>
-	  <Medium medium={medium} setMedium={setMedium}/>
-	  <div className='main-con btn-con'>
-		<button className='pr-speichern' onClick={handleSubmit}>Projekt speichern</button>
-		<span className='verwerfen' onClick={clearInputs}>Verwerfen</span>
-	  </div>
-	</form>
+	<div className='form-con'>
+		<form className='form'>
+	  	<h1>Neues projekt erstellen</h1>
+	  	<div className='main-con'>
+			<label htmlFor='ober-project' >Oberprojekt</label><br/>
+			<input list="ober-projekt" 
+			value={projektWerte}
+			name="ober-projekt" 
+			onChange={event=>setProjektWerte(event.target.value)}
+			placeholder="Bitte Oberprojekt eintragen oder auswählen"
+			className='input'/>    
+			<datalist id="ober-projekt">
+				{oberProjektOptionen.map(option=><option key={option}>{option}</option>)}
+			</datalist><br/>
+	  	</div>
+	  	<div className='main-con'>
+			<label htmlFor='unter-projekt'>Unterprojekt</label><br/>
+			<input list="unter-projekt" 
+			value={unterProjektWerte}
+			name="unter-projekt" 
+			onChange={event=>setUnterProjektWerte(event.target.value)}
+			placeholder="Bitte Unterprojekt eintragen oder auswählen"
+			className='input'/>    
+			<datalist id="unter-projekt">
+		  	{unterProjektOptionen.map(option=><option key={option}>{option}</option> )}  
+			</datalist><br/>
+	  	</div>
+	  	<div className='main-con'>
+		  	<label htmlFor='pal'>PAL</label><br/>
+		  	<input type="date" name="pal" id='pal' className='input' 
+		  	max={today}
+		  	value={datum===undefined?'':datum}
+		  	onChange={event=>setDatum(event.target.value)}
+		  	/>
+	  	</div>
+	  	<Medium medium={medium} setMedium={setMedium}/>
+	  	<div className='main-con btn-con'>
+			<button className='pr-speichern' onClick={handleSubmit}>Projekt speichern</button>
+			<span className='verwerfen' onClick={clearInputs}>Verwerfen</span>
+	  	</div>
+		</form>
+	</div>
 	
   );
 }

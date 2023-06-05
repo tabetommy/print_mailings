@@ -4,11 +4,12 @@ import {FilteredValuesContext} from '../globalState';
 import './filteredDataView.css';
 import DownloadForOfflineRoundedIcon from '@mui/icons-material/DownloadForOfflineRounded';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import moment from 'moment';
 
 
 
 
-export default function FilteredDataView() {
+export default function FilteredDataView({setData}) {
 	
 	//modal functions
 	const [open, setOpen] = React.useState(false);
@@ -29,6 +30,10 @@ export default function FilteredDataView() {
 	const [numOfPosters, setNumOfPosters]=React.useState();
 	const [numOfBrief, setNumOfBrief]=React.useState();
 	const [chartData, setChartData]=React.useState([]);
+	const [hoverEffect, setHoverEffect]=React.useState(true);
+	
+	const imageConRef=React.useRef(null);
+	
 	
 	
 	//states from global state using react context	
@@ -44,7 +49,8 @@ export default function FilteredDataView() {
 		const credentials = Realm.Credentials.anonymous();
 		try {
 		  const user = await app.logIn(credentials);
-		  const filteredDataVals= user.functions.filterData(projekt,unterprojekt,pal);
+		  const convertedPal=moment(pal).format("YYYY-MM-DD")
+		  const filteredDataVals= user.functions.filterData(projekt,unterprojekt,convertedPal);
 		  filteredDataVals.then(resp=>setFilteredData(resp));
 		} catch(err) {
 		  console.error("Failed to log in", err);
@@ -69,6 +75,7 @@ export default function FilteredDataView() {
 		  const user = await app.logIn(credentials);
 		  const allData= user.functions.getAllData();
 		  allData.then(resp=>{
+			  setData(resp);
 			  setFilteredData(resp);
 			  filterDatabyPal(resp);
 		  });
@@ -185,15 +192,50 @@ export default function FilteredDataView() {
 		);
 	  }
 	
+	/*
+	styles for the image , to be changed when hover on versionen
+	*/
+	const styles = {
+		  width:"30%",
+		  position: "relative",
+		  marginRight:"20px",
+		  marginTop: "20px",
+		  marginBottom: "16px",
+		  boxShadow: "2px 2px 10px  #888888",
+		  textAlign: "center",
+		  transition: "all .5s ease-in-out",
+	  };
+	  
+	  
+	const handleMouseEnter=(medium, version)=>{
+	   //let newVersion= version.slice(-3);
+	   let filterImages = document.querySelectorAll('.image-con-imgs-con');
+	   filterImages.forEach( element =>{
+		   if(element.classList.contains(medium) && element.classList.contains(version)){
+			  element.style.cssText=`width:30%;position:relative;margin: 20px 20px 16px 0;box-shadow:2px 2px 10px  #888888;text-align:center;text-align:center;transition: all .5s ease-in-out;transform: scale(1.1);`
+		   }
+	   });
+		
+		
+	}
+	
+	const handleMouseLeave=(medium, version)=>{
+		let filterImages = document.querySelectorAll('.image-con-imgs-con');
+		   filterImages.forEach( element =>{
+			   if(element.classList.contains(medium) && element.classList.contains(version)){
+				   element.style.cssText=`width:30%;position:relative;margin: 20px 20px 16px 0;box-shadow:2px 2px 10px  #888888;text-align:center;transition: all .5s ease-in-out`
+			   }
+		   });	
+	}
 	
 	
   return (
 	  <div>
 	  <div className="filtered-main">
-	  	<div className="image-con">
+		  <div className="image-con">
 		  <div className="image-con-btns">
-		    {/*<button  onClick={()=>filterImages('Alle', 'all')} className="btn all alleBtn">Alle</button>*/}
-            {
+			{/*<button  onClick={()=>filterImages('Alle', 'all')} className="btn all alleBtn">Alle</button>*/}
+			{
 				trackMedium.map(medium=>{
 					return(
 						<button 
@@ -206,7 +248,7 @@ export default function FilteredDataView() {
 					)
 				})
 			}
-		  	{/*
+			  {/*
 				  filteredData.map(data=>{
 					  return data.medium.map(medium=>{
 						  return (
@@ -221,24 +263,29 @@ export default function FilteredDataView() {
 			  */}
 		  </div>
 		  <div className="image-con-imgs">
-	  		{
-		  		filteredData.map(data=>{
+			  {
+				  filteredData.map(data=>{
 					  return data.medium.map(medium=>{
 						  return medium.versionen.map(version=>{
 							  return (
-								  <div className={"image-con-imgs-con Alle "+ medium.bezeichnung} key={version.version_id}>
-									<img src={version.path.imageUrl} className="image" onClick={()=>handleOpen(version.path.pdfUrl)}/>					
+								  <div className={"image-con-imgs-con Alle "+ medium.bezeichnung+ " "+ version.bezeichnung.replace(/\s+/g, "")} 
+								  key={version.version_id}
+								  style={styles}
+								  >
+									<img src={version.path.imageUrl} className="image"/>					
 									<div className="anchor">
 										<a href={version.path.pdfUrl} target="_blank">
 											<DownloadForOfflineRoundedIcon style={{ color: '#2600F2',fontSize: 70 }}/>
 										</a>
 									</div>
+									<p>{version.bezeichnung}</p>
 								  </div>
 							  )
 						  })
 					  })
 				  })
-	  		}
+				  
+			  }
 		  </div>
 		</div>
 		<div className="table-con">
@@ -259,34 +306,49 @@ export default function FilteredDataView() {
 						return med.versionen.map((version,i)=>{
 							return(
 								med.bezeichnung==="Brochure" && i===(numOfBroschüre-1)?
-								<tr key={version.version_id} style={{borderBottom:'1px solid rgb(69, 37, 242)'}}>
+								<tr key={version.version_id} style={{borderBottom:'1px solid rgb(69, 37, 242)'}}
+								onMouseEnter={()=>handleMouseEnter(med.bezeichnung, version.bezeichnung.replace(/\s+/g, ""))} 
+								onMouseLeave={()=>handleMouseLeave(med.bezeichnung, version.bezeichnung.replace(/\s+/g, ""))}
+								>
 									<td>{med.bezeichnung}</td>
 									<td>{version.bezeichnung}</td>
 									<td>{version.menge}</td>
 								</tr>
 								:
 								med.bezeichnung==="Flyer" && i===(numOfFlyer-1)?
-								<tr key={version.version_id} style={{borderBottom:'1px solid rgb(69, 37, 242)'}} >
+								<tr key={version.version_id} style={{borderBottom:'1px solid rgb(69, 37, 242)'}} 
+								onMouseEnter={()=>handleMouseEnter(med.bezeichnung, version.bezeichnung.replace(/\s+/g, ""))} 
+								onMouseLeave={()=>handleMouseLeave(med.bezeichnung, version.bezeichnung.replace(/\s+/g, ""))}
+								>
 									<td>{med.bezeichnung}</td>
 									<td>{version.bezeichnung}</td>
 									<td>{version.menge}</td>
 								</tr>
 								:
 								med.bezeichnung==="Poster" && i===(numOfPosters-1)?
-								<tr key={version.version_id} style={{borderBottom:'1px solid rgb(69, 37, 242)'}} >
+								<tr key={version.version_id} style={{borderBottom:'1px solid rgb(69, 37, 242)'}} 
+								onMouseEnter={()=>handleMouseEnter(med.bezeichnung, version.bezeichnung.replace(/\s+/g, ""))} 
+								onMouseLeave={()=>handleMouseLeave(med.bezeichnung, version.bezeichnung.replace(/\s+/g, ""))}
+								>
 									<td>{med.bezeichnung}</td>
 									<td>{version.bezeichnung}</td>
 									<td>{version.menge}</td>
 								</tr>
 								:
 								med.bezeichnung==="Brief" && i===(numOfBrief-1)?
-								<tr key={version.version_id} style={{borderBottom:'1px solid rgb(69, 37, 242)'}} >
+								<tr key={version.version_id} style={{borderBottom:'1px solid rgb(69, 37, 242)'}} 
+								onMouseEnter={()=>handleMouseEnter(med.bezeichnung, version.bezeichnung.replace(/\s+/g, ""))} 
+								onMouseLeave={()=>handleMouseLeave(med.bezeichnung, version.bezeichnung.replace(/\s+/g, ""))}
+								>
 									<td>{med.bezeichnung}</td>
 									<td>{version.bezeichnung}</td>
 									<td>{version.menge}</td>
 								</tr>
 								:
-								<tr key={version.version_id}>
+								<tr key={version.version_id}
+								onMouseEnter={()=>handleMouseEnter(med.bezeichnung, version.bezeichnung.replace(/\s+/g, ""))} 
+								onMouseLeave={()=>handleMouseLeave(med.bezeichnung, version.bezeichnung.replace(/\s+/g, ""))}
+								>
 									<td>{med.bezeichnung}</td>
 									<td>{version.bezeichnung}</td>
 									<td>{version.menge}</td>
@@ -309,7 +371,7 @@ export default function FilteredDataView() {
 		</div>
 	  </div>
 	  <div className="diagram">
-	  	{
+		  {
 		  chartData.length>0? <LineChart width={800} height={250} data={chartData}>
 			  <CartesianGrid strokeDasharray="3 3" />
 			  <XAxis dataKey="name" />
@@ -320,7 +382,7 @@ export default function FilteredDataView() {
 			</LineChart>	
 			:
 			null
-	  	}
+		  }
 	  </div>
 	  </div>
 	  

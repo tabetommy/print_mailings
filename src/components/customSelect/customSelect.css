@@ -20,13 +20,16 @@
   align-items: center;
 }
 
-.dropdown-body {
+.dropdown-body,.dropdown-body-pal {
   padding: 5px;
   border-top: 1px solid #E5E8EC;
   display: none;
 }
 
-.dropdown-body.open {
+.dropdown-body-pal{
+  background-color: #FFF;
+}
+.dropdown-body.open,.dropdown-body-pal.open{
   display: block;
 }
 
@@ -56,4 +59,15 @@
 
 .icon.open {
   transform: rotate(90deg);
+}
+
+/***************** React calender*********/
+.react-calendar {
+    border: none;  
+}
+
+.highlight{
+  color:#FFF;
+  font-weight: 700;
+  background-color:rgb(69, 37, 242);
 }

@@ -15,21 +15,26 @@ const Version=({medium, updateVersion, mediumState, medium_index})=>{
  
 
   const handleChange = (index, event) => {
-	  let neueVersion = [...medium.versionen];
+	  let newMediumState=[...mediumState]//copy medium 
+	  /*locate the medium element from medium state by index(medium_index)
+	   then navigate to versionen and then index using index sent from onchange
+	  */
+	  let version=newMediumState[medium_index].versionen[index]
 	  switch (event.target.name) {
 		  case 'version':
-		  neueVersion[index].bezeichnung = event.target.value;
-		  updateVersion([{...medium, versionen:neueVersion}]);
+		  version.bezeichnung = event.target.value;
+		  //updateVersion([{...medium, versionen:neueVersion}]);
+		  updateVersion(newMediumState)
 		  break;
 		  case 'menge':
-		  neueVersion[index].menge=parseInt(event.target.value, 10)
-		  updateVersion([{...medium, versionen:neueVersion}]);
+		  version.menge=parseInt(event.target.value, 10)
+		  updateVersion(newMediumState)
 		  addMenge();
 		  break;
 		  case 'datei':
 		  setIsFileSelected(true);
-		  neueVersion[index].datei= event.target.files[0]; 
-		  updateVersion([{...medium, versionen:neueVersion}]);
+		  version.datei= event.target.files[0]; 
+		  updateVersion(newMediumState)
 		  updatePath(index);
 		  break;
 		  default:
@@ -52,7 +57,7 @@ const Version=({medium, updateVersion, mediumState, medium_index})=>{
   //upload file and use the returned path to update the path object
   const updatePath=(index)=>{
 		 const formData = new FormData();  //create new form object
-			formData.append("myImage", mediumState[0].versionen[index].datei);//add image to form object
+			formData.append("myImage", mediumState[medium_index].versionen[index].datei);//add image to form object
 			axios({
 			  method: "post",
 			  url: "http://localhost:5000/upload-image",
@@ -60,10 +65,15 @@ const Version=({medium, updateVersion, mediumState, medium_index})=>{
 			})
 			 .then((response) => {
 			  const { data } = response; //return image url of uploaded img
-			  //update path in versionWerten state with url
-			  let neueVersion = [...medium.versionen];
-			  neueVersion[index].path= data; 
-			  updateVersion([{...medium, versionen:neueVersion}]);
+			  /*
+			  select version by medium and versionen index, 
+			  then update path of that particular versionen,
+			  then send to database
+			  */
+			  let newMediumState=[...mediumState]
+			  let version=newMediumState[medium_index].versionen[index];
+			  version.path= data; 
+			  updateVersion(newMediumState);
 			})
 			 .catch((err) => {
 			  console.log(err);
@@ -72,21 +82,26 @@ const Version=({medium, updateVersion, mediumState, medium_index})=>{
   
   
   const handleFileDelete=(index)=>{
-	    // clear datei in medium state
-		let neueVersion = [...medium.versionen];
-		neueVersion[index].datei= null;
-		updateVersion([{...medium, versionen:neueVersion}]);
-		
-		//delete file from server 
-		const {imageName}=mediumState[0].versionen[index].path
-		console.log(mediumState[0].versionen[index].path)
+		/*
+		delete file from server
+		extract file name from medium state, and feed into delete url
+		to locate file
+		*/
+		const {imageName}=mediumState[medium_index].versionen[index].path;
 		axios.delete(`http://localhost:5000/delete-image/${imageName}`)
 		.then((response)=>{
 			console.log(response.data)
 		})
 		.catch((err)=>{
 			console.log(err)
-		})	
+		});
+		
+		// clear datei and path in medium.versionen by indexes
+		let newMediumState=[...mediumState]
+		let version=newMediumState[medium_index].versionen[index];
+		version.datei= null; 
+		version.path={};
+		updateVersion(newMediumState);
    }
    
    const addVersion=(event)=>{// add a new versionen
@@ -98,29 +113,29 @@ const Version=({medium, updateVersion, mediumState, medium_index})=>{
 		 updateVersion(newMediumState);
 	}
    
-  
-	 
   return (
 	<div className='main-con'>
 		{medium.versionen.map((version,index)=>(
 			<div  key={index}>
 				<div className='versionen-input'>
 					<div className='beleg'>
-						<label htmlFor='datei'>Upload</label><br/>                 
-							<IconButton color="primary" component="label" className='btn-upload'>
+						<label htmlFor='datei'>Upload</label><br/> 
+						   <div className='btn-upload'>                
+							<IconButton sx={{color: "#FFF" }} component="label">
 								<input hidden type="file" name='datei' 
 								 onChange={event => handleChange(index, event)} />
 								<AddIcon />
 							</IconButton>
+						   </div>
 					</div>
 					<div className='versionierung'>
 						<label htmlFor='version'>Versionierung</label><br/>
-						<input type="text" id="version" name="version" className='versionierung-input'
+						<input type="text" id="version" name="version" className='versionierung-input input-white'
 						value={version.version}   onChange={event => handleChange(index, event)}/> 
 					</div>
 					<div className='versandmenge'>
 						<label htmlFor='menge'>Versandmenge</label><br/>
-						<input type="number" id="menge" name="menge" min="0" className='versandmenge-input' 
+						<input type="number" id="menge" name="menge" min="0" className='versandmenge-input input-white' 
 						value={version.menge===undefined? '': version.menge}   onChange={event => handleChange(index, event)}/> 
 					</div>
 				</div>
@@ -141,7 +156,7 @@ const Version=({medium, updateVersion, mediumState, medium_index})=>{
 			</div>
 		
 		))}
-		{<button className='btn-add' onClick={addVersion}>
+		{<button className='btn-add-version' onClick={addVersion}>
 			<AddIcon fontSize='small' />
 			Version hinzufügen
 		</button>}

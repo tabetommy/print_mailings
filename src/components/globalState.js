@@ -6,8 +6,8 @@ export const FilteredValuesContext=createContext();
 export const FilteredValuesProvider= props =>{
 	const [projekt, setProjekt]= React.useState(null);
 	const [unterprojekt, setUnterprojekt]= React.useState(null);
+	//const [pal, setPal]= React.useState(null);
 	const [pal, setPal]= React.useState(null);
-	
 	return(
 		<FilteredValuesContext.Provider 
 		value={{

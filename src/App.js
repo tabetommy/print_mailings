@@ -4,6 +4,7 @@ import './App.css';
 //import Main from './components/main/main';
 import MainComponent from './components/main/main';
 import NeuesProjekt from './components/neuesProjekt/neuesProjekte';
+import ProjektBearbeitung from './components/projektBearbeitung/projektBearbeitung';
 import logo from './Image.svg';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 
@@ -28,6 +29,7 @@ function App() {
         <Routes>
           <Route path='/' element={<MainComponent />} />
           <Route path='/neuesProjekt' element={<NeuesProjekt/>} />
+          <Route path='/projektBearbeitung' element={<ProjektBearbeitung/>} />
         </Routes>
       </div>
     </div>

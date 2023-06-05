@@ -2,6 +2,7 @@ import React,{useState, useEffect, useContext} from 'react';
 import {FilteredValuesContext} from '../globalState';
 import './filteredValues.css';
 import * as Realm from 'realm-web';
+import moment from 'moment';
 
 export const FilteredValues=()=>{
 	const [isUpdated,setIsUpdated]= React.useState(false);//check if all states have been updated
@@ -41,7 +42,7 @@ export const FilteredValues=()=>{
 			<div className='fv'>
 				<p className='fvprojekt'>{projekt}</p>
 				<span className='fvunterprojekt'>{unterprojekt} ></span>
-				<span className='fvpal'>{pal}</span>
+				<span className='fvpal'>{moment(pal).format("YYYY-MM-DD")}</span>
 			</div>
 			:
 			null
